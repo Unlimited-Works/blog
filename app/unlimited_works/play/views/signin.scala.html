@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="@routes.Assets.at("image/favicon.ico")" rel="stylesheet">
+        <!--<link rel="icon" href="image/favicon.ico">-->
+
+        <title>Signin Template for Bootstrap</title>
+
+        <!-- Bootstrap CSS -->
+        <!--<link rel="stylesheet" href="bootstrap-v4.0.0-alpha/bootstrap.min.css">-->
+        <link rel="stylesheet" href="@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.css")">
+        <!--<link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">-->
+        <!-- Custom styles for this template -->
+        <link href="@routes.Assets.at("login/signin.css")" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="container">
+
+            <form class="form-signin" action="" method="post">
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <label for="inputEmail" class="sr-only">Email address</label>
+                <input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <!--<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />-->
+            </form>
+
+        </div> <!-- /container -->
+    </body>
+
+    <!-- jQuery first, then Bootstrap JS. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src=""@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.js")" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+</html>

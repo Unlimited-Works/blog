@@ -1,0 +1,6 @@
+GET     /signin               unlimited_works.play.controllers.Signin.index
+POST    /signin               unlimited_works.play.controllers.Signin.authenVerfiy
+GET     /blog/index           unlimited_works.play.controllers.Blog.index
+
+
+GET     /assets/*file         controllers.Assets.at(path="/public", file)
