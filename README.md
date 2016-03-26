@@ -1,4 +1,4 @@
-##Web server build by Play Framework
+##Web app build by Play Framework
 
 ####Depencency
 * [mongodb project](https://github.com/Unlimited-Works/mongodb)
