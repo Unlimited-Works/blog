@@ -4,7 +4,6 @@ import play.api.mvc.{Action, Controller}
 import unlimited_works.play.socket.dao.module.LoginModule
 import unlimited_works.play.views
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 /**
   * signin page
@@ -29,11 +28,11 @@ object Signin extends Controller {
       */
     val account = form.get("account").map(_.head).getOrElse("")
     val password = form.get("password").map(_.head).getOrElse("")
-    val rst = LoginModule.verifyAndGetId("administrator", "12345_md5")//(account, password)
-//    val rst = LoginModule.verify(account, password)
+    val rst = LoginModule.verifyAndGetId(account, password)
     rst.map{ x =>
       println(s"AccountVerifyResult - $x")
-      Ok("ok")
+      if(x._id.nonEmpty) Ok("ok")
+      else Ok("fail")
     }
   }
 }
