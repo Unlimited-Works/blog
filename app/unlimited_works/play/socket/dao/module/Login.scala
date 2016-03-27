@@ -1,7 +1,6 @@
 package unlimited_works.play.socket.dao.module
 
 import lorance.rxscoket.presentation.json.IdentityTask
-import rx.lang.scala.Observable
 import unlimited_works.play.socket.DaoCommunicate
 import unlimited_works.play.socket.dao.Method
 
@@ -9,7 +8,7 @@ import lorance.rxscoket.presentation.getTaskId
 
 import scala.concurrent.Promise
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import net.liftweb.json._
 /**
   * {
   * "taskId": "thread-1:timestamp",//if not have represent needn't call back
@@ -57,6 +56,8 @@ object LoginModule {
   def verifyAndGetId(account: String, password: String) = {
     val proto = AccountVerifyByAggregate(getTaskId, dBName, collName, Method.AGGREGATE,
       List(AggMatch(Match(List(UserName(account), Phone(account), Email(account), PenName(account)), password)), Limit(1), Project(IdProject(1))))
+    implicit val formats = DefaultFormats
+
     DaoCommunicate.getDefaultInstance.flatMap{o => o.sendWithResult[AccountVerifyByAggregateResult, AccountVerifyByAggregate](proto)}
 //    DaoCommunicate.getDefaultInstance.sendWithResult[AccountVerifyByAggregateResult, AccountVerifyByAggregate](proto)
   }
@@ -86,5 +87,4 @@ case class Project(`$project`: IdProject) extends AggregatePipe
 case class IdProject(_id: Int)
 case class ObjectId(`$oid`: String)
 
-case class AccountVerifyByAggregateResult(taskId: String, _id: ObjectId) extends IdentityTask
-
+case class AccountVerifyByAggregateResult(taskId: String, _id: Option[ObjectId]) extends IdentityTask
