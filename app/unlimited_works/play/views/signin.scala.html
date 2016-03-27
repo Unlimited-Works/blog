@@ -19,30 +19,47 @@
         <!--<link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">-->
         <!-- Custom styles for this template -->
         <link href="@routes.Assets.at("login/signin.css")" rel="stylesheet">
+        <link href="/assets/login/css/login.css" rel="stylesheet">
     </head>
 
     <body>
         <div class="container">
 
-            <form class="form-signin" action="" method="post">
+            <!--<form class="form-signin" action="" method="post">-->
+                <!--<h2 class="form-signin-heading">Please sign in</h2>-->
+                <!--<label for="inputEmail" class="sr-only">Email address</label>-->
+                <!--<input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">-->
+                <!--<label for="inputPassword" class="sr-only">Password</label>-->
+                <!--<input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">-->
+                <!--<div class="checkbox">-->
+                    <!--<label>-->
+                        <!--<input type="checkbox" value="remember-me"> Remember me-->
+                    <!--</label>-->
+                <!--</div>-->
+                <!--<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>-->
+                <!--&lt;!&ndash;<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />&ndash;&gt;-->
+            <!--</form>-->
+
+            <div class="form-signin">
                 <h2 class="form-signin-heading">Please sign in</h2>
                 <label for="inputEmail" class="sr-only">Email address</label>
                 <input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">
                 <label for="inputPassword" class="sr-only">Password</label>
                 <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">
+                <p class="tip indent" id="signin-tip"></p>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" value="remember-me"> Remember me
+                        <input type="checkbox" value="remember-me"> Remember me - todo
                     </label>
                 </div>
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <button class="btn btn-lg btn-primary btn-block ajax-btn-verify" type="submit">Sign in</button>
                 <!--<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />-->
-            </form>
-
+            </div>
         </div> <!-- /container -->
     </body>
 
     <!-- jQuery first, then Bootstrap JS. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/assets/login/js/login.js"></script>
     <script src=""@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.js")" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
 </html>

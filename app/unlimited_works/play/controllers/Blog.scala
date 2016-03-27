@@ -15,8 +15,12 @@ object Blog extends Controller {
 //    }.getOrElse {
 //      Redirect("/signin")
 //    }
-    Ok(views.html.blog.index("l_chen"))
+    Ok(views.html.blog.index())
 
+  }
+
+  def post = Action { request =>
+    Ok(views.html.blog.post())
   }
 
 //  def content(blogId: String) = Action { request =>
