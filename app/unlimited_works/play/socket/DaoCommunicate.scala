@@ -76,6 +76,10 @@ object DaoCommunicate {
     log(s"Instance a DaoCommunicate")
     val client =  new ClientEntrance("127.0.0.1", 10001)
     val connectFuture = client.connect
+
+    //TODO fix bug
+    //has bug: when completed, it will be closed emit even through next sender
+    //so, the JProtocol should be created for every message which contains taskId.
     connectFuture.map(c => new JProtocol(c, c.startReading))
   }
 }

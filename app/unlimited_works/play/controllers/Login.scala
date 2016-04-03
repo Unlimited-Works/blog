@@ -1,6 +1,6 @@
 package unlimited_works.play.controllers
 
-import play.api.mvc.{Results, Action, Controller}
+import play.api.mvc.{Action, Controller}
 import unlimited_works.play.socket.dao.module.LoginModule
 import unlimited_works.play.views
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,23 +23,6 @@ object Signin extends Controller {
     Ok(views.html.signin())
   }
 
-  def authenVerfiy = Action.async { implicit request =>
-    val form = request.body.asFormUrlEncoded.get
-
-    /**
-      * TODO data form http should be confirmed by Bean that match the logic
-      * some annotation such as email and password format, length of the password, etc.s
-      */
-    val account = form.get("account").map(_.head).getOrElse("")
-    val password = form.get("password").map(_.head).getOrElse("")
-    val rst = LoginModule.verifyAndGetId(account, password)
-    rst.map{ x =>
-      println(s"AccountVerifyResult - $x")
-      if(x._id.nonEmpty) Results.Redirect("/blog/index")//Ok("ok")
-      else Ok(views.html.signin())
-    }
-  }
-
   def ajaxAuthenVerfiy = Action.async { implicit request =>
     val form = request.body.asFormUrlEncoded.get
     val account = form.get("account").map(_.head).getOrElse("")
@@ -51,10 +34,9 @@ object Signin extends Controller {
       val rst = LoginModule.verifyAndGetId(account, password)
       rst.map { x =>
         println(s"AccountVerifyResult - $x")
-        if (x._id.nonEmpty) Ok(compactRender("result" -> 200))
+        if (x.result.nonEmpty) Ok(compactRender("result" -> 200))
         else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
       }
     }
   }
 }
-

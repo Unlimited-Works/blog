@@ -1,5 +1,4 @@
 GET     /signin               unlimited_works.play.controllers.Signin.index
-POST    /signin               unlimited_works.play.controllers.Signin.authenVerfiy
 POST    /signin.jstr          unlimited_works.play.controllers.Signin.ajaxAuthenVerfiy
 GET     /blog/index           unlimited_works.play.controllers.Blog.index
 GET     /blog/post            unlimited_works.play.controllers.Blog.post
