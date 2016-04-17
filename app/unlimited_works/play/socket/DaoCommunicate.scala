@@ -68,6 +68,9 @@ object DaoCommunicate {
     p.future
   }
 
+  //reconnect
+  //1. java.net.ConnectException when client begin start
+  //2. java.nio.channels.ClosedChannelException when server disconnect
   /**
     * this stage use Future is naturally.
     */
@@ -77,9 +80,20 @@ object DaoCommunicate {
     val client =  new ClientEntrance("127.0.0.1", 10001)
     val connectFuture = client.connect
 
-    //TODO fix bug
-    //has bug: when completed, it will be closed emit even through next sender
-    //so, the JProtocol should be created for every message which contains taskId.
+    lorance.rxscoket.presentation.TIMEOUT = 10
     connectFuture.map(c => new JProtocol(c, c.startReading))
+  }
+
+  def reconnect = {
+    logLevel = 10
+    log(s"Instance a DaoCommunicate")
+    val client =  new ClientEntrance("127.0.0.1", 10010)
+    val connectFuture = client.connect
+    lorance.rxscoket.presentation.TIMEOUT = 10
+    connectFuture.map(c => new JProtocol(c, c.startReading))
+  }
+
+  lazy val modelSocket = {
+    reconnect
   }
 }

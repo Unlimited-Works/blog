@@ -9,14 +9,15 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link rel="icon" href="@routes.Assets.at("image/favicon.ico")" rel="stylesheet">
+
         <!--<link rel="icon" href="image/favicon.ico">-->
 
         <title>Signin Template for Bootstrap</title>
 
         <!-- Bootstrap CSS -->
-        <!--<link rel="stylesheet" href="bootstrap-v4.0.0-alpha/bootstrap.min.css">-->
-        <link rel="stylesheet" href="@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.css")">
-        <!--<link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">-->
+        <!--<link rel="stylesheet" href="@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.css")">-->
+        <link href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
         <!-- Custom styles for this template -->
         <link href="@routes.Assets.at("login/signin.css")" rel="stylesheet">
         <link href="/assets/login/css/login.css" rel="stylesheet">
@@ -59,7 +60,10 @@
     </body>
 
     <!-- jQuery first, then Bootstrap JS. -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/assets/lib/jquery-2.2.3.min.js"></script>
+    <script src=""@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.js")"></script>
+    <!--<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+
     <script src="/assets/login/js/login.js"></script>
-    <script src=""@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.js")" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+
 </html>

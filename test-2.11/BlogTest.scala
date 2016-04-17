@@ -1,6 +1,7 @@
-import unlimited_works.play.socket.dao.module.Blog
-import unlimited_works.play.socket.dao.module.Blog.BlogModel
+import unlimited_works.play.socket.dao.module.blog.Blog
+import Blog.BlogModel
 import lorance.rxscoket._
+import unlimited_works.play.socket.dao.module.blog.Blog
 
 import scala.concurrent.ExecutionContext.Implicits.global
 /**

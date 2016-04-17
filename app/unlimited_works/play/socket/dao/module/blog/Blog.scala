@@ -1,16 +1,17 @@
-package unlimited_works.play.socket.dao.module
+package unlimited_works.play.socket.dao.module.blog
 
 import java.util.concurrent.TimeoutException
 
+import lorance.rxscoket.presentation.getTaskId
 import lorance.rxscoket.presentation.json.IdentityTask
 import net.liftweb.json.DefaultFormats
-import scala.collection.mutable
-import scala.concurrent.Promise
 import rx.lang.scala.Observable
 import unlimited_works.play.socket.DaoCommunicate
-import lorance.rxscoket.presentation.getTaskId
 import unlimited_works.play.socket.dao.Method
+
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Promise
 
 /**
   * find with skip X and limit Y
@@ -56,7 +57,7 @@ object Blog {
       Method.AGGREGATE,
       List(Match(PenName(penName)), Limit(10), Skip(skip)))
     DaoCommunicate.getDefaultInstance.flatMap{o =>
-      val r = o.sendWithResult[FindBlogRsp, FindBlogsReq](proto)
+      val r = o.sendWithResult[FindBlogRsp, FindBlogsReq](proto, Some(x => x.takeWhile(_.rusult.nonEmpty)))
       findBlogRstToFuture(r)
     }
   }
@@ -68,7 +69,7 @@ object Blog {
       Method.INSERT,
       InsertParam(blog))
     DaoCommunicate.getDefaultInstance.flatMap{o =>
-      val r = o.sendWithResult[InsertRsp, InsertBlog](proto, Some(x => x.result.nonEmpty))
+      val r = o.sendWithResult[InsertRsp, InsertBlog](proto, Some(x => x.takeUntil(_.result.isEmpty)))
       insertBlogFuture(r)
     }
   }

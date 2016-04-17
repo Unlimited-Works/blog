@@ -1,6 +1,19 @@
-GET     /signin               unlimited_works.play.controllers.Signin.index
-POST    /signin.jstr          unlimited_works.play.controllers.Signin.ajaxAuthenVerfiy
-GET     /blog/index           unlimited_works.play.controllers.Blog.index
-GET     /blog/post            unlimited_works.play.controllers.Blog.post
+#关于路由的设计: 对于帖子来说,是允许任何人访问的.对于每个人的主页是不直接对外暴露的.
 
-GET     /assets/*file         controllers.Assets.at(path="/public", file)
+GET     /signin                   unlimited_works.play.controllers.Signin.index
+POST    /signin.jstr              unlimited_works.play.controllers.Signin.ajaxAuthenVerfiy
+
+#add id as root path
+GET     /blog/index               unlimited_works.play.controllers.Blog.index
+GET     /blog/pen_name.jStr       unlimited_works.play.controllers.Blog.ajaxPenName
+GET     /blog/overview.jStr       unlimited_works.play.controllers.Blog.ajaxOverview(skip: Int, limit: Int)
+
+GET     /blog/post/content.jStr   unlimited_works.play.controllers.Blog.postContentAjax(id: String)
+# why must transfer id to `post` method?
+GET     /blog/post/:id/           unlimited_works.play.controllers.Blog.post(id: String)
+GET     /blog/post/test_render    unlimited_works.play.controllers.Blog.postRenderTest
+GET     /blog/post/test_render.jStr    unlimited_works.play.controllers.Blog.postRenderTest
+
+GET     /assets/*file             controllers.Assets.at(path="/public", file)
+
+GET     /*undefined               unlimited_works.play.controllers.Other.undefined(undefined: String)

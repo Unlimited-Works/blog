@@ -34,7 +34,9 @@ object Signin extends Controller {
       val rst = LoginModule.verifyAndGetId(account, password)
       rst.map { x =>
         println(s"AccountVerifyResult - $x")
-        if (x.result.nonEmpty) Ok(compactRender("result" -> 200))
+        if (x.result.nonEmpty) {
+          Ok(compactRender("result" -> 200)).withSession(request.session + ("accountId", x.result.get._id.`$oid`) + ("t", "v"))
+        }
         else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
       }
     }

@@ -48,7 +48,7 @@ object LoginModule {
     implicit val formats = DefaultFormats
 
     DaoCommunicate.getDefaultInstance.flatMap{o =>
-      val x = o.sendWithResult[AccountVerifyByAggregateResult, AccountVerifyByAggregate](proto, Some(x => x.result.nonEmpty))
+      val x = o.sendWithResult[AccountVerifyByAggregateResult, AccountVerifyByAggregate](proto, Some(x => x.takeUntil(_.result.isEmpty)))
       toFuture(x)
     }
 //    DaoCommunicate.getDefaultInstance.sendWithResult[AccountVerifyByAggregateResult, AccountVerifyByAggregate](proto)
@@ -59,7 +59,7 @@ object LoginModule {
     observable.subscribe(
       s => {println(s"verifyAndGetId get Promise value"); p.trySuccess(s)},
       e => {println(s"verifyAndGetId get Promise Error"); p.tryFailure(e)},
-      () => {println(s"verifyAndGetId get Completed");  p.tryFailure(new TimeoutException())}
+      () => {println(s"verifyAndGetId get Completed");  p.trySuccess(AccountVerifyByAggregateResult("", None))}
     )
 
     p.future
