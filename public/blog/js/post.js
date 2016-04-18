@@ -23,17 +23,18 @@ $(document).ready(function($){
             homePage.text(json.post.pen_name);
 
             $('#post-issue-time').text(json.post.issue_time);
-            postFilter(json.post.body);
+            postRender(json.post.body);
           }
       }
     );
   });
 
   //transfer raw post body format to xml
-  function postFilter(body){
-    var filter = body;
+  function postRender(body){
     var content = '# Markdown text goes in here\n## Markdown text goes in here\n### Markdown text goes in here\n';
-    $('#post-body').text(content);
-    $('body').append('<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>');
+    var converter = new showdown.Converter();
+//        text      = '#hello, markdown!',
+    var    html      = converter.makeHtml(content);
+    $('#post-body').html(html);
   }
 });
