@@ -3,7 +3,6 @@ package unlimited_works.play.socket.dao.module.blog
 import lorance.rxscoket.presentation.json.IdentityTask
 import rx.lang.scala.Observable
 import unlimited_works.play.socket.DaoCommunicate
-import unlimited_works.play.socket.dao.module.blog.PenName.PenNameReq
 
 import scala.concurrent.{Promise, Future}
 import scala.concurrent.ExecutionContext.Implicits.global

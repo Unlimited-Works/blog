@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   */
 object Post {
+  //todo protocol not match
   def get(id: String) = {
     DaoCommunicate.modelSocket.flatMap{jp =>
       val rstObv = jp.sendWithResult[PostRsp, PostReq](PostReq(id),

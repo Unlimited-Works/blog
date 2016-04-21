@@ -13,8 +13,8 @@
     <link rel="icon" href="/assets/image/favicon.ico" rel="stylesheet">
 
     <!-- Bootstrap Core CSS -->
-    <!--<link href="/assets/blog/css/bootstrap.min.css" rel="stylesheet">-->
-    <link href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/blog/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">-->
 
     <!-- Custom CSS -->
     <link href="/assets/blog/css/clean-blog.min.css" rel="stylesheet">
@@ -77,10 +77,11 @@
     </div>
 </header>
 <!--<textarea>-->
-    <xmp style="display:none;" id="post-body">
+    <div id="post-body">
 ##temp
-    </xmp>
-<!--</textarea>-->
+    </div>
+
+
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -117,7 +118,30 @@
             </div>
         </div>
     </footer>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@@mdo">edit</button>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">Message:</label>
+                        <textarea class="form-control input-lg" id="message-text" rows="15"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-save-blog">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- jQuery -->
     <!--<script src="/assets/blog/js/jquery.js"></script>-->
     <!--<script src="http://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>-->
@@ -132,6 +156,8 @@
     <script src="/assets/blog/js/post.js"></script>
     <!--markdown parser should be apply after md text prepared. so it append by .js-->
     <!--<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.3.0/showdown.min.js"></script>
+
 </body>
 
 </html>

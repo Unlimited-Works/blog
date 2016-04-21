@@ -2,7 +2,7 @@ jQuery(document).ready(function($) {
   var penNameUrl = "/blog/pen_name.jStr"
   var overviewUrl = "/blog/overview.jStr"
 
-  var PageBlogsCount = 5;
+  var PageBlogsCount = 3;
   var currentBlogsCount = 0;
 
   //functions
@@ -73,15 +73,20 @@ jQuery(document).ready(function($) {
   });
 
   //next blog
-  $('.pager > .next').click(function(){
+  $('.btn-next-blog').click(function(){
     var ts = $(this);
     paginatorOfBlogs(currentBlogsCount, PageBlogsCount, function(content){
       if(content.size == 0) {
-        ts.text("No More");
+        ts.prop('disabled', true);
+        ts.text('No More');
       } else {
         $('.post-preview-content').append(content.load);
       }
     })
+  });
+
+  $('#btn-create-blog').click(function(){
+    window.location = "/blog/post/create";
   });
 
 });

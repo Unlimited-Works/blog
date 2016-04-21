@@ -11,8 +11,11 @@ GET     /blog/overview.jStr       unlimited_works.play.controllers.Blog.ajaxOver
 GET     /blog/post/content.jStr   unlimited_works.play.controllers.Blog.postContentAjax(id: String)
 # why must transfer id to `post` method?
 GET     /blog/post/:id/           unlimited_works.play.controllers.Blog.post(id: String)
-GET     /blog/post/test_render    unlimited_works.play.controllers.Blog.postRenderTest
-GET     /blog/post/test_render.jStr    unlimited_works.play.controllers.Blog.postRenderTest
+POST     /blog/post/save.jStr    unlimited_works.play.controllers.Blog.postBlogAjax
+POST     /blog/post/create.jStr    unlimited_works.play.controllers.Blog.createBlogAjax
+
+GET     /blog/post/create         unlimited_works.play.controllers.Blog.createBlog
+#POST   /blog/post/createSubmit.jStr        unlimited_works.play.controllers.Blog.createSubmitAjax
 
 GET     /assets/*file             controllers.Assets.at(path="/public", file)
 
