@@ -1,22 +1,27 @@
 #关于路由的设计: 对于帖子来说,是允许任何人访问的.对于每个人的主页是不直接对外暴露的.
+#521 服务器处理结果出现非预期状态
 
 GET     /signin                   unlimited_works.play.controllers.Signin.index
 POST    /signin.jstr              unlimited_works.play.controllers.Signin.ajaxAuthenVerfiy
+POST 		/signin/register.json			unlimited_works.play.controllers.Signin.registerAjax
 
 #add id as root path
 GET     /blog/index               unlimited_works.play.controllers.Blog.index
 GET     /blog/pen_name.jStr       unlimited_works.play.controllers.Blog.ajaxPenName
 GET     /blog/overview.jStr       unlimited_works.play.controllers.Blog.ajaxOverview(skip: Int, limit: Int)
 
-GET     /blog/post/content.jStr   unlimited_works.play.controllers.Blog.postContentAjax(id: String)
+GET     /blog/post/content.jStr   unlimited_works.play.controllers.Blog.postContentAjax(id: String, shareSHA: String)
 # why must transfer id to `post` method?
 GET     /blog/post/:id/           unlimited_works.play.controllers.Blog.post(id: String)
 POST     /blog/post/save.jStr    unlimited_works.play.controllers.Blog.postBlogAjax
 POST     /blog/post/create.jStr    unlimited_works.play.controllers.Blog.createBlogAjax
+POST     /blog/post/delete.json    unlimited_works.play.controllers.Blog.deleteBlogAjax
 
-GET     /blog/post/create         unlimited_works.play.controllers.Blog.createBlog
-#POST   /blog/post/createSubmit.jStr        unlimited_works.play.controllers.Blog.createSubmitAjax
+GET     /blog/post/create         		unlimited_works.play.controllers.Blog.createBlog
+POST   /blog/post/access/modify.json   unlimited_works.play.controllers.Blog.postModifyAccess
+GET    /blog/post/access/$postId<.+>.json        unlimited_works.play.controllers.Blog.postAccess(postId: String)
 
 GET     /assets/*file             controllers.Assets.at(path="/public", file)
 
+GET			/401											unlimited_works.play.controllers.Other.unAuthentication
 GET     /*undefined               unlimited_works.play.controllers.Other.undefined(undefined: String)

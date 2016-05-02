@@ -18,14 +18,10 @@ verify data from browser->web server->dao->mongo is reachable
 * 需要让rxsocket的presentation层提供终止Observable观察条件的函数参数,因为
 find查询不是一次返回的.不能认为只要收到一个taskId就结束.另外,sendWithTask方法
 应该返回Observable而不是Future
-
-####Bug
-* blog overview high chance get less content, suspect it because socket deal data with error sequence.
-for detail, it occurred at JPrototol taskId.
-
 * post overview功能显示出帖子,并提供翻页功能
-* post 帖子的全文观看(包含修改,删除按钮)
 * blog编辑帖子功能
+* 文章可以通过url分享,分享的url要带有一个shareSHA.当取消分享时,该hash无效,链接也不可用  
+::为什么用SHA? 防止用户随意输入.
 
 ####为什么写这个程序?
 自己开发一个博客的根本目的是磨练自己编程的技巧.

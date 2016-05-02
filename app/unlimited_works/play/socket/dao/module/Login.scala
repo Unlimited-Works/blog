@@ -25,7 +25,6 @@ import scala.concurrent.Promise
 object LoginModule {
   val dBName = "helloworld"
   val collName = "account"
-  lorance.rxscoket.presentation.TIMEOUT = 10
   /**
     * find -
     * method: aggregate
@@ -58,7 +57,7 @@ object LoginModule {
     val p = Promise[AccountVerifyByAggregateResult]
     observable.subscribe(
       s => {println(s"verifyAndGetId get Promise value"); p.trySuccess(s)},
-      e => {println(s"verifyAndGetId get Promise Error"); p.tryFailure(e)},
+      e => {println(s"verifyAndGetId get Promise Error - $e"); p.tryFailure(e)},
       () => {println(s"verifyAndGetId get Completed");  p.trySuccess(AccountVerifyByAggregateResult("", None))}
     )
 

@@ -8,7 +8,7 @@
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="@routes.Assets.at("image/favicon.ico")" rel="stylesheet">
+        <link rel="icon" href="/assets/image/favicon.ico" rel="stylesheet">
 
         <!--<link rel="icon" href="image/favicon.ico">-->
 
@@ -17,52 +17,99 @@
         <!-- Bootstrap CSS -->
         <!--<link rel="stylesheet" href="@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.css")">-->
         <link href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/assets/blog/css/bootstrap.min.css" rel="stylesheet">
 
         <!-- Custom styles for this template -->
-        <link href="@routes.Assets.at("login/signin.css")" rel="stylesheet">
+        <link href="/assets/login/signin.css" rel="stylesheet">
         <link href="/assets/login/css/login.css" rel="stylesheet">
     </head>
 
     <body>
         <div class="container">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#tab-signin">Signin</a></li>
+                <li><a data-toggle="tab" href="#tab-register">Register</a></li>
+                <!--<li><a data-toggle="tab" href="#tab-hello">Hello</a></li>-->
+            </ul>
 
-            <!--<form class="form-signin" action="" method="post">-->
-                <!--<h2 class="form-signin-heading">Please sign in</h2>-->
-                <!--<label for="inputEmail" class="sr-only">Email address</label>-->
-                <!--<input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">-->
-                <!--<label for="inputPassword" class="sr-only">Password</label>-->
-                <!--<input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">-->
-                <!--<div class="checkbox">-->
-                    <!--<label>-->
-                        <!--<input type="checkbox" value="remember-me"> Remember me-->
-                    <!--</label>-->
-                <!--</div>-->
-                <!--<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>-->
-                <!--&lt;!&ndash;<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />&ndash;&gt;-->
-            <!--</form>-->
-
-            <div class="form-signin">
-                <h2 class="form-signin-heading">Please sign in</h2>
-                <label for="inputEmail" class="sr-only">Email address</label>
-                <input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">
-                <label for="inputPassword" class="sr-only">Password</label>
-                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">
-                <p class="tip indent" id="signin-tip"></p>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="remember-me"> Remember me - todo
-                    </label>
+            <div class="tab-content">
+                <div class="form-signin tab-pane fade in active" id="tab-signin">
+                    <h2 class="form-signin-heading">Please sign in</h2>
+                    <label for="inputEmail" class="sr-only">Email address</label>
+                    <input type="" id="inputEmail" name="account" class="form-control" placeholder="Username/Email" required="" autofocus="">
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="">
+                    <p class="tip indent" id="signin-tip"></p>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="remember-me"> Remember me - todo
+                        </label>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block ajax-btn-verify" type="submit">Sign in</button>
+                    <!--<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />-->
                 </div>
-                <button class="btn btn-lg btn-primary btn-block ajax-btn-verify" type="submit">Sign in</button>
-                <!--<input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in" />-->
+                <!--<div id="home" class="tab-pane fade in active">-->
+                    <!--<h3>HOME</h3>-->
+                    <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>-->
+                <!--</div>-->
+                <div id="tab-register" class="tab-pane fade" class="row">
+                    <div class="col-sm-6">
+                        <h2 class="form-signin-heading">Register</h2>
+                        <!--invitation code-->
+                        <p>
+                            <label for="inputPassword" class="sr-only">Invitation code</label>
+                            <input type="" id="inputInvitationCode-register" class="form-control" placeholder="Invitation code" required="">
+                        </p>
+                            <!--email-->
+                        <p>
+                            <label for="inputEmail" class="sr-only">Email address</label>
+                            <input type="" id="inputEmail-register" name="account" class="form-control" placeholder="Email" required="" autofocus="">
+                        </p>
+                            <!--username-->
+                        <!--<label for="inputEmail" class="sr-only">Email address</label>-->
+                        <p>
+                            <input type="" id="inputUsername-register" name="account" class="form-control" placeholder="Username" required="">
+                        </p>
+                            <!--phone-->
+                        <!--<label for="inputEmail" class="sr-only">Email address</label>-->
+                        <!--<input type="" id="inputPhone-register" name="account" class="form-control" placeholder="Phone" required="">-->
+                        <!--pen_name-->
+                        <!--<label for="inputEmail" class="sr-only">Email address</label>-->
+                        <p>
+                            <input type="" id="inputPenname-register" name="account" class="form-control" placeholder="PenName" required="">
+                        </p>
+                            <!--password-->
+                        <p>
+                            <label for="inputPassword" class="sr-only">Password</label>
+                            <input type="password" id="inputPassword-reigster" name="password" class="form-control" placeholder="Password" required="">
+                        </p>
+                            <!--ensure password-->
+                        <p>
+                            <label for="inputPassword" class="sr-only">Password</label>
+                            <input type="password" id="inputPassword-ensure-reigster" name="password" class="form-control" placeholder="Password again" required="">
+                        </p>
+                        <div class="alert alert-danger fade in" style="display:none;" role="alert">
+                            <button type="button" class="close" onclick="$('.alert').hide()" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+                            <span class="sr-only">Error:</span>
+                            <span class="alert-content">Enter a valid email address</span>
+
+                        </div>
+
+                        <button class="btn btn-lg btn-primary btn-block" id="btn-register" type="submit">Register</button>
+                    </div>
+                </div>
             </div>
-        </div> <!-- /container -->
+        </div>
     </body>
 
     <!-- jQuery first, then Bootstrap JS. -->
     <script src="/assets/lib/jquery-2.2.3.min.js"></script>
-    <script src=""@routes.Assets.at("bootstrap-v4.0.0-alpha/bootstrap.min.js")"></script>
-    <!--<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>-->
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
     <script src="/assets/login/js/login.js"></script>
 

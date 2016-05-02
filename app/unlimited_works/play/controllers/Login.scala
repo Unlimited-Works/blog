@@ -1,7 +1,11 @@
 package unlimited_works.play.controllers
 
+import play.api.libs.json.Json
+import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
 import unlimited_works.play.socket.dao.module.LoginModule
+import unlimited_works.play.socket.dao.module.account.Account
+import unlimited_works.play.socket.dao.module.account.Account.{AccountExistRsp}
 import unlimited_works.play.views
 import scala.concurrent.ExecutionContext.Implicits.global
 import net.liftweb.json._
@@ -39,6 +43,64 @@ object Signin extends Controller {
         }
         else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
       }
+    }
+  }
+
+  // /signin/register.json
+  def registerAjax = Action.async { req =>
+    val form = req.body.asFormUrlEncoded.get
+    val invitationCode = form.get("invitationCode").map(_.head).getOrElse("")
+    val email = form.get("email").map(_.head).getOrElse("")
+    val username = form.get("username").map(_.head).getOrElse("")
+    val penName = form.get("penName").map(_.head).getOrElse("")
+    val password = form.get("password").map(_.head).getOrElse("")
+    val passwordAgain = form.get("passwordAgain").map(_.head).getOrElse("")
+
+    case class FieldValidator(key: String, value: String, validator: String => Option[String]) {
+      def validate = validator(value.trim).map(key -> _)
+    }
+
+    //soul from Tch.He
+    val checkInput = List(
+      FieldValidator("invitationCode", invitationCode, value => if(value.isEmpty) Some("不能为空") else None),
+      FieldValidator("email", email, value => if(value.isEmpty) Some("邮箱不能为空") else None),
+      FieldValidator("username", username, value => if(value.isEmpty) Some("用户名不能为空") else None),
+      FieldValidator("penName", penName, value => if(value.isEmpty) Some("笔名不能为空") else None),
+      FieldValidator("password", password, value => {
+        if(value.isEmpty) Some("密码不能为空")
+        else if(value != passwordAgain) {
+          Some("两次密码输入不同")
+        } else None
+      })
+    ).foldLeft(Json.obj()) { (errors, fieldValidator) =>
+      fieldValidator.validate.map{e => errors.+((e._1, JsString(e._2)))}.getOrElse(errors)
+    }
+
+    if(checkInput.values.isEmpty) {
+      Account.invitationCodeUseable_?(invitationCode).flatMap{canUse =>
+        if(canUse) {
+          Account.accountExist(email, username, penName).map{
+            case AccountExistRsp(None, _, _) =>
+              Account.useInvitationCode(invitationCode)
+              Account.register(email, username, penName, password)
+              Ok(Json.obj("result" -> 200))
+            case AccountExistRsp(Some(account), _, _) =>
+              if(account.penName == penName) {
+                Ok(Json.obj("result" -> 400, "error" -> "pen_name已存在"))
+              } else if(account.username == username) {
+                Ok(Json.obj("result" -> 400, "error" -> "usernmae已存在"))
+              } else if(account.email == email){
+                Ok(Json.obj("result" -> 400, "error" -> "email已存在"))
+              }else {
+                Ok(Json.obj("result" -> 400, "error" -> "其他错误"))
+              }
+          }
+        } else {
+          Future.successful(Ok(Json.obj("result" -> 400, "error" -> "邀请码不可用")))
+        }
+      }
+    } else {
+      Future.successful(Ok(checkInput.+("result" -> JsNumber(400))))
     }
   }
 }
