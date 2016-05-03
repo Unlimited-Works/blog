@@ -47,16 +47,10 @@ $(document).ready(function($){
 				if (json.result == 200) {
 					if(json.hasSHA) {//to open status
 						globalShareSHA = json.share_sha;
-						shareElem.addClass("btn-warning");
-						shareElem.text("public");
-						shareElem.data('is-public', true);
+
 
 						onPublic();
 					} else {//to close status
-						globalShareSHA = "";
-						shareElem.addClass("btn-info");
-						shareElem.text("private");
-						shareElem.data('is-public', false);
 
 						onPrivate();
 					}
@@ -66,6 +60,12 @@ $(document).ready(function($){
 	});
 
 	function onPublic() {
+		shareElem.removeClass("btn-info");
+		shareElem.addClass("btn-warning");
+		shareElem.text("public");
+		shareElem.data('is-public', true);
+
+
 		$('#access-tips').html('当前帖子是公开状态,访问链接为 ' +
 		window.location.protocol + "//" +
 		window.location.host +
@@ -75,6 +75,12 @@ $(document).ready(function($){
 	}
 
 	function onPrivate() {
+		globalShareSHA = "";
+		shareElem.removeClass("btn-warning");
+		shareElem.addClass("btn-info");
+		shareElem.text("private");
+		shareElem.data('is-public', false);
+
 		$('#access-tips').text('当前帖子为私有状态,是否开放链接?');
     $('#btn-post-access-modify').text('Open Access');
 	}
