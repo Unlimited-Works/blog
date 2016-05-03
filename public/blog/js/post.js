@@ -2,8 +2,6 @@ $(document).ready(function($){
   var contentUrl = "/blog/post/content.jStr";
   var authorHomePageUrl = '/blog/'
 
-  var converter = new showdown.Converter();
-
   $(function(){
 		var searchParams = Common.getQueryString('share_sha');
     $.get(
@@ -16,6 +14,7 @@ $(document).ready(function($){
         console.log("Data: " + json + "\nStatus: " + status);
 
         if (json.result === 200) {
+        	$('title').text(json.title);
           $('#post-title').text(json.title);
           $('#post-introduction').replaceWith(json.introduction)
 
@@ -43,6 +42,7 @@ $(document).ready(function($){
   function postRender(body){
 //    var content = '# Markdown text goes in here\n## Markdown text goes in here\n### Markdown text goes in here\n```\nvar x = "123"\n```';
     content = body;
+		var converter = new showdown.Converter();
     var html = converter.makeHtml(content);
     $('#message-text').val(content);
     $('#post-body').html(html);
