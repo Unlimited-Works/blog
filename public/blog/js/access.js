@@ -67,7 +67,7 @@ $(document).ready(function($){
 
 	function onPublic() {
 		$('#access-tips').html('当前帖子是公开状态,访问链接为 ' +
-		window.location.protocol + "\\\\" +
+		window.location.protocol + "//" +
 		window.location.host +
 		window.location.pathname +
 		'?share_sha=' + globalShareSHA)
