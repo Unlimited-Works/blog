@@ -25,6 +25,8 @@ $(document).ready(function(){
 	};
 
 	var registerFunc = function(){
+		//按下之后要等待返回才能进行下次继续请求,防止注册成功再次点击注册会导致错误的提示
+		$("#btn-register").prop('disabled', true);
 		var invitationCode = $('#inputInvitationCode-register').val()
 		var email = $('#inputEmail-register').val()
 		var username = $('#inputUsername-register').val()
@@ -44,10 +46,12 @@ $(document).ready(function(){
 			},
 			function(json) {
 				if(json.result == 400) {
+					$("#btn-register").prop('disabled', false);
 					var danger = $('.alert-danger');
 					danger.find('.alert-content').text(JSON.stringify(json));
 					$('.alert').show();
 				} else if(json.result == 200 ) {
+					$("#btn-register").prop('disabled', true);
 					var danger = $('.alert-danger');
 					danger.find('.alert-content').text("注册成功");
 					$('.alert').show();
