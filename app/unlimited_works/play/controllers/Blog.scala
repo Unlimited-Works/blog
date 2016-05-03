@@ -152,14 +152,17 @@ object Blog extends Controller {
 
       PenName.get(accountId) zip Post.get(postId) flatMap {
         case (pn, p) if pn.pen_name == p.pen_name => //author
-          val sp = blog.split('\n')
-          val first = Try(sp(0)).getOrElse("todo")
-          val second = Try(sp(1)).getOrElse("todo")
-          SaveBlog.update(second, first, blog, postId).map {
-            case None =>
-              Ok(compactRender("result" -> 200))
-            case Some(msg) =>
-              Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+          if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
+          else {
+            val sp = blog.split('\n')
+            val first = Try(sp(0)).getOrElse("todo")
+            val second = Try(sp(1)).getOrElse("todo")
+            SaveBlog.update(second, first, blog, postId).map {
+              case None =>
+                Ok(compactRender("result" -> 200))
+              case Some(msg) =>
+                Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+            }
           }
         case _ => //
           Future.successful(Ok(compactRender("result" -> 401)))
@@ -184,11 +187,14 @@ object Blog extends Controller {
     val time = System.currentTimeMillis.toString
     //    PenName.get(id).flatMap{ i =>
     PenName.get(id).flatMap { pn =>
-      SaveBlog.create(second, first, blog, time, pn.pen_name).map {
-        case None =>
-          Ok(compactRender("result" -> 200))
-        case Some(msg) =>
-          Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+      if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
+      else {
+        SaveBlog.create(second, first, blog, time, pn.pen_name).map {
+          case None =>
+            Ok(compactRender("result" -> 200))
+          case Some(msg) =>
+            Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+        }
       }
     }
   }
