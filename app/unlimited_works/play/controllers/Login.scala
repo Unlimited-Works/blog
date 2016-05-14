@@ -3,6 +3,7 @@ package unlimited_works.play.controllers
 import play.api.libs.json.Json
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
+import unlimited_works.play.controllers.util.WithCors
 import unlimited_works.play.socket.dao.module.LoginModule
 import unlimited_works.play.socket.dao.module.account.Account
 import unlimited_works.play.socket.dao.module.account.Account.{AccountExistRsp}
@@ -27,21 +28,25 @@ object Signin extends Controller {
     Ok(views.html.signin())
   }
 
-  def ajaxAuthenVerfiy = Action.async { implicit request =>
-    val form = request.body.asFormUrlEncoded.get
-    val account = form.get("account").map(_.head).getOrElse("")
-    val password = form.get("password").map(_.head).getOrElse("")
+  def ajaxAuthenVerfiy = WithCors{
+    Action.async {
+      implicit request =>
 
-    if(account.isEmpty || password.isEmpty)
-      Future(Ok(compactRender(("result" -> 400) ~ ("msg" -> "账号和密码不能为空"))))
-    else {
-      val rst = LoginModule.verifyAndGetId(account, password)
-      rst.map { x =>
-        println(s"AccountVerifyResult - $x")
-        if (x.result.nonEmpty) {
-          Ok(compactRender("result" -> 200)).withSession(request.session + ("accountId", x.result.get._id.`$oid`) + ("t", "v"))
+      val form = request.body.asFormUrlEncoded.get
+      val account = form.get("account").map(_.head).getOrElse("")
+      val password = form.get("password").map(_.head).getOrElse("")
+
+      if(account.isEmpty || password.isEmpty)
+        Future(Ok(compactRender(("result" -> 400) ~ ("msg" -> "账号和密码不能为空"))))
+      else {
+        val rst = LoginModule.verifyAndGetId(account, password)
+        rst.map { x =>
+          println(s"AccountVerifyResult - $x")
+          if (x.result.nonEmpty) {
+            Ok(compactRender("result" -> 200)).withSession(request.session + ("accountId", x.result.get._id.`$oid`) + ("t", "v"))
+          }
+          else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
         }
-        else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
       }
     }
   }

@@ -17,7 +17,7 @@ POST     /blog/post/save.jStr    unlimited_works.play.controllers.Blog.postBlogA
 POST     /blog/post/create.jStr    unlimited_works.play.controllers.Blog.createBlogAjax
 POST     /blog/post/delete.json    unlimited_works.play.controllers.Blog.deleteBlogAjax
 
-GET     /blog/post/create         		unlimited_works.play.controllers.Blog.createBlog
+GET    /blog/post/create         		unlimited_works.play.controllers.Blog.createBlog
 POST   /blog/post/access/modify.json   unlimited_works.play.controllers.Blog.postModifyAccess
 GET    /blog/post/access/$postId<.+>.json        unlimited_works.play.controllers.Blog.postAccess(postId: String)
 
