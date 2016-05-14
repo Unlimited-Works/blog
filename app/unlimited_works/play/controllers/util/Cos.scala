@@ -19,7 +19,7 @@ case class WithCors[A](action: Action[A]) extends Action[A] with Results{
         request =>
           Future.successful( Ok("").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
-            ACCESS_CONTROL_ALLOW_METHODS -> (List("GET","POST").toSet + "OPTIONS").mkString(", "),
+            ACCESS_CONTROL_ALLOW_METHODS -> (List("GET","POST") + "OPTIONS").mkString(", "),
             ACCESS_CONTROL_MAX_AGE -> "1728000",//20 days
             ACCESS_CONTROL_ALLOW_HEADERS ->  s"$ORIGIN, X-Requested-With, $CONTENT_TYPE, $ACCEPT, $AUTHORIZATION, X-Auth-Token",
             ACCESS_CONTROL_ALLOW_CREDENTIALS -> "true"))
