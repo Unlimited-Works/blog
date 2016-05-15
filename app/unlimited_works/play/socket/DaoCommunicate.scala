@@ -16,7 +16,7 @@ object DaoCommunicate {
     * this stage use Future is naturally.
     */
   lazy val getDefaultInstance = {
-    logLevel = 10
+    logLevel = 1000
     log(s"Instance a DaoCommunicate")
     val client =  new ClientEntrance("127.0.0.1", 10001)
     val connectFuture = client.connect
@@ -34,6 +34,7 @@ object DaoCommunicate {
   }
 
   lazy val modelSocket = {
+    lorance.rxscoket.presentation.JPROTO_TIMEOUT = 20
     reconnect
   }
 

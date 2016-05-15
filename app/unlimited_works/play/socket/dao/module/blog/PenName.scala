@@ -17,7 +17,7 @@ object PenName {
     *   taskId: "pen_name"
     *   accountId:
     * }
-    *
+    * todo check - should handle errors if penName not exist
     * @param accountId
     */
   def get(accountId: String) = {

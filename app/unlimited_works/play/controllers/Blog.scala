@@ -5,8 +5,7 @@ import java.util.Date
 
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
-import unlimited_works.play.controllers.util.Config.Cors
-import unlimited_works.play.controllers.util.{WithLogin, WithCors}
+import unlimited_works.play.controllers.util.{Config, WithLogin, WithCors}
 import unlimited_works.play.socket.dao.module.blog.{DeleteBlog, SaveBlog, Post, Overview, PenName}
 import unlimited_works.play.socket.dao.module.blog.Post.{Post => PostRsp}
 import unlimited_works.play.util.SessionMultiDomain
@@ -25,6 +24,7 @@ import scala.util.{Success, Try}
 object Blog extends Controller {
 
   //authenticate confirmation from cookie named uuid
+  @Deprecated
   def index = Action { request =>
     val logined_? = request.session.get("accountId").nonEmpty
     if (logined_?) Ok(views.html.blog.index())
@@ -119,7 +119,11 @@ object Blog extends Controller {
           Ok(rsp)
         }
 
-        request.session.get("accountId") match {
+        val actId = request.cookies.get(Config.CookieSession.GOD_SESSION).map(_.value).flatMap { coki =>
+          SessionMultiDomain.get(coki, "accountId")
+        }
+
+        actId match {
           case None => //visitor or other
             Post.get(id) map { post =>
               if (post.share_sha.exists(_.equals(share_sha))) {
@@ -189,144 +193,155 @@ object Blog extends Controller {
     * visitor - session accountId's pen_name != post.pen_name
     * no-login / other - session not contains accountId
     */
-  def postBlogAjax = Action.async { implicit request =>
-    request.session.get("accountId").map { accountId =>
-      val form = request.body.asFormUrlEncoded.get
-      val blog = form.get("blog").map(_.head).getOrElse("")
-      val postId = form.get("postId").map(_.head).getOrElse("")
+  def postBlogAjax = WithCors {
+    Action.async { implicit request =>
+      SessionMultiDomain.getAccountId(request).map { accountId =>
+        val form = request.body.asFormUrlEncoded.get
+        val blog = form.get("blog").map(_.head).getOrElse("")
+        val postId = form.get("postId").map(_.head).getOrElse("")
 
-      PenName.get(accountId) zip Post.get(postId) flatMap {
-        case (pn, p) if pn.pen_name == p.pen_name => //author
-          if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
-          else {
-            val sp = blog.split('\n')
-            val first = Try(sp(0)).getOrElse("todo")
-            val second = Try(sp(1)).getOrElse("todo")
-            SaveBlog.update(second, first, blog, postId).map {
-              case None =>
-                Ok(compactRender("result" -> 200))
-              case Some(msg) =>
-                Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+        PenName.get(accountId) zip Post.get(postId) flatMap {
+          case (pn, p) if pn.pen_name == p.pen_name => //author
+            if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
+            else {
+              val sp = blog.split('\n')
+              val first = Try(sp(0)).getOrElse("todo")
+              val second = Try(sp(1)).getOrElse("todo")
+              SaveBlog.update(second, first, blog, postId).map {
+                case None =>
+                  Ok(compactRender("result" -> 200))
+                case Some(msg) =>
+                  Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+              }
             }
-          }
-        case _ => //
-          Future.successful(Ok(compactRender("result" -> 401)))
-      }
-    }.getOrElse(Future.successful(Ok(compactRender("result" -> 401))))
+          case _ => //
+            Future.successful(Ok(compactRender("result" -> 401)))
+        }
+      }.getOrElse(Future.successful(Ok(compactRender("result" -> 401))))
+    }
   }
 
+  @Deprecated
   def createBlog = Action { request =>
     val logined_? = request.session.get("accountId").nonEmpty
     if (logined_?) Ok(views.html.blog.create())
     else Ok(views.html.signin())
   }
 
-  def createBlogAjax = Action.async { implicit request =>
-    val id = request.session.get("accountId").getOrElse("")
-    val form = request.body.asFormUrlEncoded.get
-    val blog = form.get("blog").map(_.head).getOrElse("")
+  def createBlogAjax = WithCors {
+    Action.async { implicit request =>
+      val id = SessionMultiDomain.getAccountId(request).getOrElse("")
+      val form = request.body.asFormUrlEncoded.get
+      val blog = form.get("blog").map(_.head).getOrElse("")
 
-    val sp = blog.split('\n')
-    val first = Try(sp(0)).getOrElse("todo")
-    val second = Try(sp(1)).getOrElse("todo")
-    val time = System.currentTimeMillis.toString
-    //    PenName.get(id).flatMap{ i =>
-    PenName.get(id).flatMap { pn =>
-      if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
-      else {
-        SaveBlog.create(second, first, blog, time, pn.pen_name).map {
-          case None =>
-            Ok(compactRender("result" -> 200))
-          case Some(msg) =>
-            Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+      val sp = blog.split('\n')
+      val first = Try(sp(0)).getOrElse("todo")
+      val second = Try(sp(1)).getOrElse("todo")
+      val time = System.currentTimeMillis.toString
+      //    PenName.get(id).flatMap{ i =>
+      PenName.get(id).flatMap { pn =>
+        if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
+        else {
+          SaveBlog.create(second, first, blog, time, pn.pen_name).map {
+            case None =>
+              Ok(compactRender("result" -> 200))
+            case Some(msg) =>
+              Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+          }
         }
       }
     }
   }
 
   //post
-  def deleteBlogAjax = Action.async{ req =>
-    val id = req.session.get("accountId").getOrElse("")
-    val form = req.body.asFormUrlEncoded.get
-    val postId = form.get("postId").map(_.head).getOrElse("")
+  def deleteBlogAjax = WithCors {
+    Action.async{ req =>
+      val id = SessionMultiDomain.getAccountId(req).getOrElse("")
+      val form = req.body.asFormUrlEncoded.get
+      val postId = form.get("postId").map(_.head).getOrElse("")
 
-    //is the post belong to the accountId
-    PenName.get(id) zip Post.get(postId) flatMap{ //pnAndPost =>
-      //compare the post penName does equal to penName
-      case (pn, p) if pn.pen_name == p.pen_name =>
-        DeleteBlog.delete(postId) map {
-          case None => Ok(Json.obj("result" -> 200))
-          case Some(error) => Ok(Json.obj("result" -> 400, "error" -> "delete fail"))
-        }
-      case _ =>
-        Future.successful(Ok(Json.obj("result" -> 400, "error" -> "post is not yours")))
+      //is the post belong to the accountId
+      PenName.get(id) zip Post.get(postId) flatMap{ //pnAndPost =>
+        //compare the post penName does equal to penName
+        case (pn, p) if pn.pen_name == p.pen_name =>
+          DeleteBlog.delete(postId) map {
+            case None => Ok(Json.obj("result" -> 200))
+            case Some(error) => Ok(Json.obj("result" -> 400, "error" -> "delete fail"))
+          }
+        case _ =>
+          Future.successful(Ok(Json.obj("result" -> 400, "error" -> "post is not yours")))
+      }
     }
   }
 
-  def postAccess(postId: String) = Action.async{req =>
-    Post.get(postId) map {
-      case PostRsp(_, _, _, _, _, Some(sha)) =>
-        Ok(Json.obj("result" -> 200,
-          "isPublic" -> true,
-          "share_sha" -> sha
-        ))
-      case _ =>
-        Ok(Json.obj("result" -> 200,
-          "isPublic" -> false
-        ))
+  def postAccess(postId: String) = WithCors {
+    Action.async{req =>
+      Post.get(postId) map {
+        case PostRsp(_, _, _, _, _, Some(sha)) =>
+          Ok(Json.obj("result" -> 200,
+            "isPublic" -> true,
+            "share_sha" -> sha
+          ))
+        case _ =>
+          Ok(Json.obj("result" -> 200,
+            "isPublic" -> false
+          ))
+      }
     }
   }
 
-  def postModifyAccess = Action.async { request =>
-    val id = request.session.get("accountId").getOrElse("")
-    val form = request.body.asFormUrlEncoded.get
+  def postModifyAccess = WithCors{
+    Action.async { request =>
+      val id = SessionMultiDomain.getAccountId(request).getOrElse("")//request.session.get("accountId").getOrElse("")
+      val form = request.body.asFormUrlEncoded.get
 
-    val postId = form.get("postId").map(_.head).getOrElse("")
-    val currentIsPublic = form.get("currentIsPublic").map(_.head).getOrElse("")
-    def strToBool(str: String) = str match {
-      case "true" => Some(true)
-      case "false" => Some(false)
-      case _ => None
-    }
-    val rst = strToBool(currentIsPublic) match {
-      case Some(curIsPublic) => //
-        //verify is author
-        PenName.get(id) zip Post.get(postId) flatMap{
-          case (pn, p) if pn.pen_name == p.pen_name =>
-            Post.modifyAccess(postId, !curIsPublic) map {
-              case Some(shareSha) =>
-                if(!curIsPublic) {//返回了shareSHA -> toPublic -> curIsPublic is false
-                  //ok
-                  Ok(Json.obj(
-                    "result" -> 200,
-                    "hasSHA" -> true,
-                    "share_sha" -> shareSha))
-                } else {
-                  Ok(Json.obj("result" -> 521,
-                    "hasSHA" -> true,
-                    "share_sha" -> shareSha,
-                    "error" -> "这种情况不需要返回一个shareSHA"))
-                }
-              case None =>
-                if(curIsPublic) {//没有返回shareSHA -> toPublic is false -> curIsPublic is true
-                  Ok(Json.obj("result" -> 200, "hasSHA" -> false))
-                } else {
-                  Ok(Json.obj("result" -> 521, "hasSHA" -> false, "error" -> "这种情况需要返回一个shareSHA"))
-                }
-            }
-          case _ =>
-            Future.successful(Ok(Json.obj(
-              "result" -> 401,
-              "error" -> "can't modify the post access because it is not yours"
-            )))
-        }
-      case _ => //not contains the param
-        Future.successful(Ok(Json.obj(
-          "result" -> 400,
-          "error" -> "currentIsPublic parameter can't transfer to Boolean"
-        )))
-    }
+      val postId = form.get("postId").map(_.head).getOrElse("")
+      val currentIsPublic = form.get("currentIsPublic").map(_.head).getOrElse("")
+      def strToBool(str: String) = str match {
+        case "true" => Some(true)
+        case "false" => Some(false)
+        case _ => None
+      }
+      val rst = strToBool(currentIsPublic) match {
+        case Some(curIsPublic) => //
+          //verify is author
+          PenName.get(id) zip Post.get(postId) flatMap{
+            case (pn, p) if pn.pen_name == p.pen_name =>
+              Post.modifyAccess(postId, !curIsPublic) map {
+                case Some(shareSha) =>
+                  if(!curIsPublic) {//返回了shareSHA -> toPublic -> curIsPublic is false
+                    //ok
+                    Ok(Json.obj(
+                      "result" -> 200,
+                      "hasSHA" -> true,
+                      "share_sha" -> shareSha))
+                  } else {
+                    Ok(Json.obj("result" -> 521,
+                      "hasSHA" -> true,
+                      "share_sha" -> shareSha,
+                      "error" -> "这种情况不需要返回一个shareSHA"))
+                  }
+                case None =>
+                  if(curIsPublic) {//没有返回shareSHA -> toPublic is false -> curIsPublic is true
+                    Ok(Json.obj("result" -> 200, "hasSHA" -> false))
+                  } else {
+                    Ok(Json.obj("result" -> 521, "hasSHA" -> false, "error" -> "这种情况需要返回一个shareSHA"))
+                  }
+              }
+            case _ =>
+              Future.successful(Ok(Json.obj(
+                "result" -> 401,
+                "error" -> "can't modify the post access because it is not yours"
+              )))
+          }
+        case _ => //not contains the param
+          Future.successful(Ok(Json.obj(
+            "result" -> 400,
+            "error" -> "currentIsPublic parameter can't transfer to Boolean"
+          )))
+      }
 
-    rst
+      rst
+    }
   }
 }

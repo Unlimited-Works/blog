@@ -1,5 +1,8 @@
 package unlimited_works.play.util
 
+import play.api.mvc.Request
+import unlimited_works.play.controllers.util.Config
+
 import scala.collection.mutable
 
 /**
@@ -52,4 +55,10 @@ object SessionMultiDomain {
   def getAll(id1: String) = sessions.synchronized(sessions.get(id1))
 
   def get(id1: String, id2: String) = sessions.synchronized(sessions.get(id1).flatMap(_.get(id2)))
+
+  def getAccountId[A](request: Request[A]) = {
+    request.cookies.get(Config.CookieSession.GOD_SESSION).map(_.value).flatMap{
+      get(_, Config.CookieSession.ACCOUNT_ID)
+    }
+  }
 }
