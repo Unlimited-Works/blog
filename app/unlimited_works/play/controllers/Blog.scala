@@ -5,8 +5,11 @@ import java.util.Date
 
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
+import unlimited_works.play.controllers.util.Config.Cors
+import unlimited_works.play.controllers.util.WithCors
 import unlimited_works.play.socket.dao.module.blog.{DeleteBlog, SaveBlog, Post, Overview, PenName}
 import unlimited_works.play.socket.dao.module.blog.Post.{Post => PostRsp}
+import unlimited_works.play.util.SessionMultiDomain
 import unlimited_works.play.views
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -109,32 +112,41 @@ object Blog extends Controller {
   }
 
   //pen_name
-  def ajaxPenName = Action.async{ implicit request =>
-    val id = request.session("accountId")
+  def ajaxPenName = WithCors {
+    Action.async { implicit request =>
+      val accountId = request.cookies.get("GOD_SESSION").flatMap { cok =>
+        SessionMultiDomain.get(cok.value, "accountId")
+      }.getOrElse("")
+      PenName.get(accountId).map { r =>
+        Ok(compactRender(("result" -> 200) ~ ("penName" -> r.pen_name)))
+      }
+//      Future.successful( Ok(compactRender(("result" -> 200) ~ ("penName" -> "123"))))
 
-    PenName.get(id).map{ r =>
-      Ok(compactRender(("result" -> 200) ~ ("penName" -> r.pen_name)))
     }
   }
 
   //title, issue_item, introduction
-  def ajaxOverview(skip: Int, limit: Int) = Action.async{ implicit request =>
-    val id = request.session.get("accountId").getOrElse("")
+  def ajaxOverview(skip: Int, limit: Int) = WithCors {
+    Action.async{ implicit request =>
+      val accountId = request.cookies.get("GOD_SESSION").flatMap { cok =>
+        SessionMultiDomain.get(cok.value, "accountId")
+      }.getOrElse("")
 
-    PenName.get(id).flatMap {pName =>
-      Overview.get(pName.pen_name, skip, limit).map { s =>
-        val blogs: JArray = s.map { item =>
-          ("id" -> item.result.get.id) ~
-          ("title" -> item.result.get.title) ~
-          ("issueTime" -> {
-            val date = new Date(item.result.get.issue_time.toLong)
-            val df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-            df2.format(date)
-          }) ~
-          ("introduction" -> item.result.get.introduction)
+      PenName.get(accountId).flatMap {pName =>
+        Overview.get(pName.pen_name, skip, limit).map { s =>
+          val blogs: JArray = s.map { item =>
+            ("id" -> item.result.get.id) ~
+              ("title" -> item.result.get.title) ~
+              ("issueTime" -> {
+                val date = new Date(item.result.get.issue_time.toLong)
+                val df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+                df2.format(date)
+              }) ~
+              ("introduction" -> item.result.get.introduction)
+          }
+
+          Ok(compactRender(("result" -> 200) ~ ("blogs" -> blogs)))
         }
-
-        Ok(compactRender(("result" -> 200) ~ ("blogs" -> blogs)))
       }
     }
   }
