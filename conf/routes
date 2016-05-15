@@ -12,7 +12,8 @@ GET     /blog/overview.jStr       unlimited_works.play.controllers.Blog.ajaxOver
 
 GET     /blog/post/content.jStr   unlimited_works.play.controllers.Blog.postContentAjax(id: String, shareSHA: String)
 # why must transfer id to `post` method?
-GET     /blog/post/:id/           unlimited_works.play.controllers.Blog.post(id: String)
+#/blog/post has abort
+GET     /blog/post          unlimited_works.play.controllers.Blog.post(id: String)
 POST     /blog/post/save.jStr    unlimited_works.play.controllers.Blog.postBlogAjax
 POST     /blog/post/create.jStr    unlimited_works.play.controllers.Blog.createBlogAjax
 POST     /blog/post/delete.json    unlimited_works.play.controllers.Blog.deleteBlogAjax

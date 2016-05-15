@@ -18,4 +18,9 @@ object Config {
       }
     }
   }
+
+  object CookieSession{
+    val GOD_SESSION = "GOD_SESSION"
+    val ACCOUNT_ID = "accountId"
+  }
 }

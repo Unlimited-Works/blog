@@ -6,7 +6,7 @@ import java.util.Date
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import unlimited_works.play.controllers.util.Config.Cors
-import unlimited_works.play.controllers.util.WithCors
+import unlimited_works.play.controllers.util.{WithLogin, WithCors}
 import unlimited_works.play.socket.dao.module.blog.{DeleteBlog, SaveBlog, Post, Overview, PenName}
 import unlimited_works.play.socket.dao.module.blog.Post.{Post => PostRsp}
 import unlimited_works.play.util.SessionMultiDomain
@@ -38,11 +38,12 @@ object Blog extends Controller {
     * 2. visitor - has matched sha
     * 3. other - sha not match or post not sha
     */
+  @Deprecated
   def post(id: String) = Action.async { request =>
     val shareSHA = request.getQueryString("share_sha").getOrElse("")
     request.session.get("accountId") match {
       case None =>
-        Post.get(id).map{ post =>
+        Post.get(id).map { post =>
           if (post.share_sha.exists(_.equals(shareSHA))) {
             Ok(views.html.blog.post())
           } else {
@@ -62,6 +63,32 @@ object Blog extends Controller {
     }
   }
 
+  //todo this API can be ignored
+  @Deprecated
+  def post2(id: String) = Action.async { request =>
+    val shareSHA = request.getQueryString("share_sha").getOrElse("")
+    request.cookies.get("accountId").map(_.value) match {
+      case None =>
+        Post.get(id).map { post =>
+          if (post.share_sha.exists(_.equals(shareSHA))) {
+            Ok(Json.obj("result" -> 200))
+          } else {
+            Ok(Json.obj("result" -> 401))
+          }
+        }
+      case Some(accountId) =>
+        //todo the zip logic is frequence used
+        PenName.get(accountId) zip Post.get(id) map {
+          case (pn, post) if pn.pen_name == post.pen_name => //author
+            Ok(Json.obj("result" -> 200))
+          case (_, post) if post.share_sha.exists(_.equals(shareSHA)) => //visitor
+            Ok(Json.obj("result" -> 200))
+          case _ => //other
+            Ok(Json.obj("result" -> 401))
+        }
+    }
+  }
+
   /**
     * read blog content Authentication
     * 1. author: all content
@@ -71,44 +98,50 @@ object Blog extends Controller {
     * @param id postId
     * @return
     */
-  def postContentAjax(id: String, share_sha: String) = Action.async { request =>
-    def onSuccess(post: PostRsp, visitor: Boolean) = {
-      val formatTime = {
-        val date = new Date(post.issue_time.toLong)
-        val df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-        df2.format(date)
-      }
-      val rsp = Json.obj(
-        "result" -> 200,
-        "pen_name" -> post.pen_name,
-        "title" -> post.title,
-        "issue_time" -> formatTime,
-        "introduction" -> post.introduction,
-        "body" -> post.body,
-        "is_visitor" -> visitor
-      )
-      Ok(rsp)
-    }
-
-    request.session.get("accountId") match {
-      case None => //visitor or other
-        Post.get(id) map { post =>
-          if(post.share_sha.exists(_.equals(share_sha))) { //visitor
-            onSuccess(post, true)
-          } else { //other
-            Ok(Json.obj("result" -> 401))
+  def postContentAjax(id: String, share_sha: String) = WithCors {
+//    WithLogin { todo add with compose action client status should handle 401 STATUS
+      Action.async { request =>
+        def onSuccess(post: PostRsp, visitor: Boolean) = {
+          val formatTime = {
+            val date = new Date(post.issue_time.toLong)
+            val df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+            df2.format(date)
           }
+          val rsp = Json.obj(
+            "result" -> 200,
+            "pen_name" -> post.pen_name,
+            "title" -> post.title,
+            "issue_time" -> formatTime,
+            "introduction" -> post.introduction,
+            "body" -> post.body,
+            "is_visitor" -> visitor
+          )
+          Ok(rsp)
         }
-      case Some(accountId) =>
-        PenName.get(accountId) zip Post.get(id) map {
-          case (pn, post) if pn.pen_name == post.pen_name => //author
-            onSuccess(post, false)
-          case (_, post) if post.share_sha.exists(_.equals(share_sha)) => //visitor
-            onSuccess(post, true)
-          case _ => //other
-            Ok(Json.obj("result" -> 401))
+
+        request.session.get("accountId") match {
+          case None => //visitor or other
+            Post.get(id) map { post =>
+              if (post.share_sha.exists(_.equals(share_sha))) {
+                //visitor
+                onSuccess(post, true)
+              } else {
+                //other
+                Ok(Json.obj("result" -> 401))
+              }
+            }
+          case Some(accountId) =>
+            PenName.get(accountId) zip Post.get(id) map {
+              case (pn, post) if pn.pen_name == post.pen_name => //author
+                onSuccess(post, false)
+              case (_, post) if post.share_sha.exists(_.equals(share_sha)) => //visitor
+                onSuccess(post, true)
+              case _ => //other
+                Ok(Json.obj("result" -> 401))
+            }
         }
-    }
+      }
+//    }
   }
 
   //pen_name
