@@ -21,7 +21,7 @@ object DaoSendTest extends App {
   val reading = Observable.from(socket).flatMap(_.startReading)
   val m = reading.subscribe(r => r.foreach{x => log(s"protocol - ${new String(x.loaded.array())}")})
 
-//  val dBName = "helloworld"
+//  val dBName = "blog"
 //  val collName = "account"
 //  val account = "1"
 //  val password = "2"

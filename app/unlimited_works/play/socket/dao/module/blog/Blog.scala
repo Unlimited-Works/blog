@@ -17,13 +17,13 @@ import scala.concurrent.Promise
   * find with skip X and limit Y
   * {
   *   "taskId": "thread-1:timestamp",//if not have represent needn't call back
-  *   "dataBase": "helloworld",
+  *   "dataBase": "blog",
   *   "collection": "accounts",
   *   ...
   *}
   */
 object Blog {
-  val dBName = "helloworld"
+  val dBName = "blog"
   val collName = "blogs"
   implicit val formats = DefaultFormats
 

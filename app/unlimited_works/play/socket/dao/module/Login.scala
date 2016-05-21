@@ -17,13 +17,13 @@ import scala.concurrent.Promise
 /**
   * {
   * "taskId": "thread-1:timestamp",//if not have represent needn't call back
-    *"dataBase": "helloworld",
+    *"dataBase": "blog",
     *"collection": "accounts",
   * ...
   *}
   */
 object LoginModule {
-  val dBName = "helloworld"
+  val dBName = "blog"
   val collName = "account"
   /**
     * find -
