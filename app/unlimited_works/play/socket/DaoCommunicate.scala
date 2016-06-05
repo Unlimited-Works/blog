@@ -7,6 +7,7 @@ import rx.lang.scala.{Subject, Observable}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Promise}
 import scala.concurrent.duration._
+import unlimited_works.play.playLogger
 
 object DaoCommunicate {
   //reconnect
@@ -16,8 +17,8 @@ object DaoCommunicate {
     * this stage use Future is naturally.
     */
   lazy val getDefaultInstance = {
-    logLevel = 1000
-    log(s"Instance a DaoCommunicate")
+    playLogger.logLevel = 1000
+    playLogger.log(s"Instance a DaoCommunicate")
     val client =  new ClientEntrance("127.0.0.1", 10001)
     val connectFuture = client.connect
 
@@ -26,8 +27,8 @@ object DaoCommunicate {
 
   //todo support reconnect with some complex machines(a litter complex)
   private def reconnect = {
-    logLevel = 10
-    log(s"Instance a DaoCommunicate")
+    playLogger.logLevel = 10
+    playLogger.log(s"Instance a DaoCommunicate")
     val client =  new ClientEntrance("127.0.0.1", 10010)
     val connectFuture = client.connect
     connectFuture.map(c => new JProtocol(c, c.startReading))
@@ -38,5 +39,5 @@ object DaoCommunicate {
     reconnect
   }
 
-  lorance.rxscoket.logAim++=List("get protocol", "taskId-onNext", "proto-json", "task-json")
+  playLogger.logAim++=List("get protocol", "taskId-onNext", "proto-json", "task-json")
 }

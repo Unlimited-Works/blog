@@ -1,7 +1,7 @@
 package unlimited_works.play.socket.dao.module.blog
 
 import lorance.rxscoket.presentation.json.IdentityTask
-import lorance.rxscoket.log
+import unlimited_works.play.playLogger
 import rx.lang.scala.Observable
 import unlimited_works.play.socket.DaoCommunicate
 
@@ -32,7 +32,7 @@ object PenName {
     val p = Promise[PenNameRsp]
     observable.subscribe(
       s => {
-        log(s"pen name $s", -100)
+        playLogger.log(s"pen name $s", -100)
         p.trySuccess(s)},
       e => p.tryFailure(e)
     )

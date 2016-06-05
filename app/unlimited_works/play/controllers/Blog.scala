@@ -157,8 +157,6 @@ object Blog extends Controller {
       PenName.get(accountId).map { r =>
         Ok(compactRender(("result" -> 200) ~ ("penName" -> r.pen_name)))
       }
-//      Future.successful( Ok(compactRender(("result" -> 200) ~ ("penName" -> "123"))))
-
     }
   }
 
@@ -243,10 +241,12 @@ object Blog extends Controller {
         if(blog.length > 5000) Future.successful(Ok(compactRender(("result" -> 400) ~ ("error" -> "文章不能超过5000字"))))
         else {
           SaveBlog.create(second, first, blog, time, pn.pen_name).map {
-            case None =>
-              Ok(compactRender("result" -> 200))
-            case Some(msg) =>
+            case (None, Some(postId)) =>
+              Ok(compactRender(("result" -> 200) ~ ("postId" -> postId)))
+            case (Some(msg),_) =>
               Ok(compactRender(("result" -> 400) ~ ("error" -> msg)))
+            case _ =>
+              Ok(compactRender(("result" -> 400) ~ ("error" -> "UnExceptError")))
           }
         }
       }
@@ -290,10 +290,10 @@ object Blog extends Controller {
     }
   }
 
-  def postModifyAccess = WithCors{
+  def postModifyAccess = WithCors {
     Action.async { request =>
-      val id = SessionMultiDomain.getAccountId(request).getOrElse("")//request.session.get("accountId").getOrElse("")
-      val form = request.body.asFormUrlEncoded.get
+      val id = SessionMultiDomain.getAccountId(request).getOrElse("") //request.session.get("accountId").getOrElse("")
+    val form = request.body.asFormUrlEncoded.get
 
       val postId = form.get("postId").map(_.head).getOrElse("")
       val currentIsPublic = form.get("currentIsPublic").map(_.head).getOrElse("")
@@ -305,11 +305,12 @@ object Blog extends Controller {
       val rst = strToBool(currentIsPublic) match {
         case Some(curIsPublic) => //
           //verify is author
-          PenName.get(id) zip Post.get(postId) flatMap{
+          PenName.get(id) zip Post.get(postId) flatMap {
             case (pn, p) if pn.pen_name == p.pen_name =>
               Post.modifyAccess(postId, !curIsPublic) map {
                 case Some(shareSha) =>
-                  if(!curIsPublic) {//返回了shareSHA -> toPublic -> curIsPublic is false
+                  if (!curIsPublic) {
+                    //返回了shareSHA -> toPublic -> curIsPublic is false
                     //ok
                     Ok(Json.obj(
                       "result" -> 200,
@@ -322,7 +323,8 @@ object Blog extends Controller {
                       "error" -> "这种情况不需要返回一个shareSHA"))
                   }
                 case None =>
-                  if(curIsPublic) {//没有返回shareSHA -> toPublic is false -> curIsPublic is true
+                  if (curIsPublic) {
+                    //没有返回shareSHA -> toPublic is false -> curIsPublic is true
                     Ok(Json.obj("result" -> 200, "hasSHA" -> false))
                   } else {
                     Ok(Json.obj("result" -> 521, "hasSHA" -> false, "error" -> "这种情况需要返回一个shareSHA"))
@@ -342,6 +344,24 @@ object Blog extends Controller {
       }
 
       rst
+    }
+  }
+
+  def isSelfByPenName(penName: Option[String]) = WithCors {
+    Action.async { req =>
+      SessionMultiDomain.getAccountId(req).map { accountId =>
+        PenName.get(accountId).map { pName =>
+          (penName, pName) match {
+            case (Some(p_name), PenName.PenNameRsp(s_p_name, _)) if p_name == s_p_name => //author
+              Ok(Json.obj("result" -> 200))
+            case (None, _) | (Some(""), _) => //author
+              Ok(Json.obj("result" -> 200))
+            case (Some(p_name), PenName.PenNameRsp(s_p_name, _)) if p_name != s_p_name => //visitor
+              Ok(Json.obj("result" -> 400))
+
+          }
+        }
+      }.getOrElse(Future.successful(Ok(Json.obj("result" -> 400))))
     }
   }
 }

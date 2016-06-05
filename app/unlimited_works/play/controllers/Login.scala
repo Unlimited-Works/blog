@@ -16,6 +16,9 @@ import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
 
 import scala.concurrent.Future
+import java.nio.charset.{StandardCharsets => SC}
+import play.utils.UriEncoding
+
 
 /**
   * signin page
@@ -42,7 +45,7 @@ object Signin extends Controller {
       }
   }
 
-  def ajaxAuthenVerfiy = //SessionFilter {
+  def ajaxAuthenVerfiy =
     WithCors {
         Action.async {
           implicit request =>
@@ -69,6 +72,25 @@ object Signin extends Controller {
         }
     }
 
+  def isSelf(accountId: Option[String]) = WithCors {
+    Action { req =>
+      //self query accountId == session accountId or (accountId == None && sessionId logined)
+      //self accountId
+      (SessionMultiDomain.getAccountId(req), accountId) match {
+        case (Some(sId), Some(queryId)) if sId == queryId =>
+          Ok(Json.obj("result" -> 200))
+        case (Some(sId), None | Some("")) =>
+          Ok(Json.obj("result" -> 200))
+        case _ => Ok(Json.obj("result" -> 400))
+      }
+    }
+  }
+
+//  def isSelf2 = WithCors {
+//    Action {
+//      Ok(Json.obj("result" -> 200))
+//    }
+//  }
   // /signin/register.json
   def registerAjax = WithCors {
     Action.async { req =>

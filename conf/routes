@@ -2,6 +2,9 @@
 #521 服务器处理结果出现非预期状态
 
 GET     /signin                   unlimited_works.play.controllers.Signin.index
+GET     /is_self.json             unlimited_works.play.controllers.Signin.isSelf(accountId: Option[String])
+GET     /is_self_by_pen_name.json     unlimited_works.play.controllers.Blog.isSelfByPenName(penName: Option[String])
+
 POST    /signin.jstr              unlimited_works.play.controllers.Signin.ajaxAuthenVerfiy
 POST 		/signin/register.json			unlimited_works.play.controllers.Signin.registerAjax
 

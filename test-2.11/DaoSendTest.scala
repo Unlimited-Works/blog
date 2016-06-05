@@ -11,6 +11,7 @@ import rx.lang.scala.Observable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.StdIn
 import lorance.rxscoket.session.implicitpkg._
+import unlimited_works.play.playLogger
 /**
   *
   */
@@ -19,7 +20,7 @@ object DaoSendTest extends App {
   val socket = client.connect
 //  val connect =
   val reading = Observable.from(socket).flatMap(_.startReading)
-  val m = reading.subscribe(r => r.foreach{x => log(s"protocol - ${new String(x.loaded.array())}")})
+  val m = reading.subscribe(r => playLogger.log(s"protocol - ${new String(r.loaded.array())}"))
 
 //  val dBName = "blog"
 //  val collName = "account"
@@ -69,12 +70,12 @@ object DaoSendTest extends App {
   }
 
   val one = reading.map{x =>
-    log(s"read.map{")
+    playLogger.log(s"read.map{")
     1
   }
 
   val y = one.foreach { x =>
-    log(s"receive one - $x")
+    playLogger.log(s"receive one - $x")
     //    p.trySuccess(x)
   }
 
@@ -91,7 +92,7 @@ object DaoSendTest extends App {
     */
   def inputLoop = {
     while (true) {
-      log(s"input message:")
+      playLogger.log(s"input message:")
       val line = StdIn.readLine()
       val data = ByteBuffer.wrap(enCoding(line))
       socket.flatMap { s => {

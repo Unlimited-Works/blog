@@ -3,7 +3,7 @@ package unlimited_works.play.socket.dao.module.blog
 import lorance.rxscoket.presentation.json.IdentityTask
 import rx.lang.scala.Observable
 import unlimited_works.play.socket.DaoCommunicate
-
+import unlimited_works.play.playLogger
 import scala.concurrent.{Promise, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -25,7 +25,7 @@ object Overview {
     val lst = scala.collection.mutable.ListBuffer[OverviewRsp]()
     observable.subscribe(
       s => {
-        lorance.rxscoket.log("overview Rsp ready - " + lst.mkString("\n"))
+        playLogger.log("overview Rsp ready - " + lst.mkString("\n"))
         lst.synchronized(lst.+=(s))
       },
       e => p.tryFailure(e),
