@@ -10,7 +10,9 @@ resolvers += "Typesafe repository" at
 
 libraryDependencies ++= Seq(
   "io.reactivex" %% "rxscala" % "0.26.0",
-  "net.liftweb" %% "lift-json" % "3.0-M8"
+  "net.liftweb" %% "lift-json" % "3.0-M8",
+  "com.googlecode.xmemcached" % "xmemcached" % "2.0.1",
+  "net.debasishg" %% "redisclient" % "3.0"
 )
 
 enablePlugins(PlayScala)
