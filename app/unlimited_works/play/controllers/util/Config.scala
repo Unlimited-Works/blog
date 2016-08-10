@@ -11,6 +11,8 @@ object Config {
     val CORS_SERVERS_DOMAIN = Value(2, "https://server.scalachan.com")
     val CORS_WWW_DOMAIN = Value(3, "http://www.scalachan.com")
     val CORS_WWWS_DOMAIN = Value(4, "https://www.scalachan.com")
+    val CORS_WWWS_DOMAIN_TEST = Value(5, "https://www.scalachan.com:4000")
+    val CORS_WWWSs_DOMAIN_TEST = Value(6, "https://www.scalachan.com:4000")
 
     def find(src: String) = {
       values.find{x =>
