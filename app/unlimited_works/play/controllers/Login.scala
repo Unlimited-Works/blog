@@ -62,7 +62,7 @@ object Signin extends Controller {
                 if (x.result.nonEmpty) {
                   val key = Helpers.stringTo32ByteMD5(account + password)
                   val accountId = x.result.get._id.`$oid`
-                  SessionMultiDomain.puts(key, Map("accountId" -> accountId))
+                  SessionMultiDomain.put(key, "accountId" -> accountId)
 
                   Ok(compactRender("result" -> 200)).withCookies(Cookie(name = "GOD_SESSION", value = key, maxAge = Some(3600 * 24 * 365), domain = Some(".scalachan.com"), httpOnly = false))
                 }
