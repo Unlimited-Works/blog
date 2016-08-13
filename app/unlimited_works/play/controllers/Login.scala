@@ -73,15 +73,17 @@ object Signin extends Controller {
     }
 
   def isSelf(accountId: Option[String]) = WithCors {
-    Action { req =>
+    Action.async { req =>
       //self query accountId == session accountId or (accountId == None && sessionId logined)
       //self accountId
-      (SessionMultiDomain.getAccountId(req), accountId) match {
-        case (Some(sId), Some(queryId)) if sId == queryId =>
-          Ok(Json.obj("result" -> 200))
-        case (Some(sId), None | Some("")) =>
-          Ok(Json.obj("result" -> 200))
-        case _ => Ok(Json.obj("result" -> 400))
+      SessionMultiDomain.getAccountId(req).map { sActId =>
+        (sActId, accountId) match {
+          case (Some(sId), Some(queryId)) if sId == queryId =>
+            Ok(Json.obj("result" -> 200))
+          case (Some(sId), None | Some("")) =>
+            Ok(Json.obj("result" -> 200))
+          case _ => Ok(Json.obj("result" -> 400))
+        }
       }
     }
   }
