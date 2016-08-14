@@ -15,10 +15,11 @@ libraryDependencies ++= Seq(
   "net.liftweb" %% "lift-json" % "3.0-M8",
   "com.googlecode.xmemcached" % "xmemcached" % "2.0.1",
 //  "net.debasishg" %% "redisclient" % "3.1",
+  "com.scalachan" %% "rxsocket" % "0.9.7",
   "com.livestream" %% "scredis" % "2.0.6"
 
 )
 
 enablePlugins(PlayScala)
 
-unmanagedBase :=  baseDirectory.value / "mylib"
+//unmanagedBase :=  baseDirectory.value / "mylib"
