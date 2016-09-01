@@ -1,15 +1,13 @@
 package unlimited_works.play.socket
 
 import lorance.rxscoket.session._
-import lorance.rxscoket._
 import lorance.rxscoket.presentation.json._
-import rx.lang.scala.{Subject, Observable}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Promise}
-import scala.concurrent.duration._
 import unlimited_works.play.playLogger
 
 object DaoCommunicate {
+  lorance.rxscoket.presentation.JPROTO_TIMEOUT = 30
+
   //reconnect
   //1. java.net.ConnectException when client begin start
   //2. java.nio.channels.ClosedChannelException when server disconnect

@@ -7,6 +7,9 @@ import scredis._
 
 import scala.concurrent.{ExecutionContext, Future}
 
+object RedisService {
+  val client = Redis()
+}
 /**
   * should be save a specify place,such as a memcache server
   */
@@ -14,7 +17,7 @@ object SessionMultiDomain {
   //out key is session id, inner key is every data's id
 //  private val sessions = mutable.Map[String, mutable.Map[String, String]]()
 //  var redisClient = new RedisClient("127.0.0.1", 6379)
-  val redisClient = Redis()
+  val redisClient = RedisService.client
 
   def puts(id1: String, data: Map[String, String]): Future[Unit] = {
     redisClient.hmSet(id1, data)

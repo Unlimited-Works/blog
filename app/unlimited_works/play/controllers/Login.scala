@@ -1,23 +1,19 @@
 package unlimited_works.play.controllers
 
-import java.security.MessageDigest
-
 import play.api.libs.json.Json
 import play.api.libs.json._
 import play.api.mvc.{Cookie, Action, Controller}
-import unlimited_works.play.controllers.util.WithCors
+import unlimited_works.play.controllers.util.{Config, WithCors}
 import unlimited_works.play.socket.dao.module.LoginModule
 import unlimited_works.play.socket.dao.module.account.Account
 import unlimited_works.play.socket.dao.module.account.Account.AccountExistRsp
-import unlimited_works.play.util.{Helpers, SessionMultiDomain}
+import unlimited_works.play.util.{FutureEx, RedisService, Helpers, SessionMultiDomain}
 import unlimited_works.play.views
 import scala.concurrent.ExecutionContext.Implicits.global
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
 
 import scala.concurrent.Future
-import java.nio.charset.{StandardCharsets => SC}
-import play.utils.UriEncoding
 
 
 /**
@@ -57,16 +53,20 @@ object Signin extends Controller {
               Future(Ok(compactRender(("result" -> 400) ~ ("msg" -> "账号和密码不能为空"))))
             else {
               val rst = LoginModule.verifyAndGetId(account, password)
-              rst.map { x =>
+              rst.flatMap { x =>
                 println(s"AccountVerifyResult - $x")
                 if (x.result.nonEmpty) {
-                  val key = Helpers.stringTo32ByteMD5(account + password)
+                  val key = Helpers.stringTo32ByteMD5(account + password).toUpperCase
                   val accountId = x.result.get._id.`$oid`
-                  SessionMultiDomain.put(key, "accountId" -> accountId)
-
-                  Ok(compactRender("result" -> 200)).withCookies(Cookie(name = "GOD_SESSION", value = key, maxAge = Some(3600 * 24 * 365), domain = Some(".scalachan.com"), httpOnly = false))
+                  SessionMultiDomain.put(key, "accountId" -> accountId).map { x =>
+                    println("result - " + x + ":" + key + " " + account)
+                    Ok(compactRender("result" -> 200)).withCookies(
+                      Cookie(name = Config.CookieSession.GOD_SESSION, value = key, maxAge = Some(3600 * 24 * 365), domain = Some(".scalachan.com"), httpOnly = false),
+                      Cookie(name = Config.CookieSession.VISITOR, value = "", maxAge = Some(-1), domain = Some(".scalachan.com"), httpOnly = false)
+                    )
+                  }
                 }
-                else Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败")))
+                else Future.successful(Ok(compactRender(("result" -> 400) ~ ("msg" -> "身份验证失败"))))
               }
             }
         }
@@ -112,6 +112,7 @@ object Signin extends Controller {
       val checkInput = List(
         FieldValidator("invitationCode", invitationCode, value => if (value.isEmpty) Some("不能为空") else None),
         FieldValidator("email", email, value => if (value.isEmpty) Some("邮箱不能为空") else None),
+        FieldValidator("email", email, value => if (!unlimited_works.play.util.Format.checkEmail(email)) Some("邮箱格式不正确") else None),
         FieldValidator("username", username, value => if (value.isEmpty) Some("用户名不能为空") else None),
         FieldValidator("penName", penName, value => if (value.isEmpty) Some("笔名不能为空") else None),
         FieldValidator("password", password, value => {
@@ -125,11 +126,18 @@ object Signin extends Controller {
       }
 
       if (checkInput.values.isEmpty) {
-        Account.invitationCodeUseable_?(invitationCode).flatMap { canUse =>
+        Account.invitationCodeUseable_?(invitationCode).flatMap{inDbCanUse => //verify in db
+          if(inDbCanUse) Future.successful(true) else {
+            FutureEx.toFutureOpt(req.cookies.find(_.name == Config.CookieSession.VISITOR).
+              map(_.value).
+              map(x => RegisterMailCache.getMailNumber(x, email))).
+              map(_.flatten.contains(invitationCode))
+          }
+        }.flatMap { canUse =>
           if (canUse) {
             Account.accountExist(email, username, penName).map {
               case AccountExistRsp(None, _, _) =>
-                Account.useInvitationCode(invitationCode)
+                Account.useInvitationCode(invitationCode) //todo refine - if verify by email NOT do this
                 Account.register(email, username, penName, password)
                 Ok(Json.obj("result" -> 200))
               case AccountExistRsp(Some(account), _, _) =>
@@ -144,12 +152,33 @@ object Signin extends Controller {
                 }
             }
           } else {
-            Future.successful(Ok(Json.obj("result" -> 400, "error" -> "邀请码不可用")))
+            Future.successful(Ok(Json.obj("result" -> 400, "error" -> "邀请码不可用或者与邮箱不匹配")))
           }
         }
       } else {
         Future.successful(Ok(checkInput.+("result" -> JsNumber(400))))
       }
     }
+  }
+}
+
+object RegisterMailCache {
+  val REGISTER_MAIL = "register_mail"
+
+  val redisClient = RedisService.client
+  val cacheSeconds = 60 * 15
+  def getKeyBySession(visitorSession: String) = visitorSession + "__" + REGISTER_MAIL
+
+  def clearMailCode(visitorSession: String): Future[Boolean] ={
+    val code = ((Math.random() * 9 + 1) * 100000).toInt.toString
+    val key = getKeyBySession(visitorSession)
+    redisClient.set(key, code).flatMap { _ =>
+      redisClient.expire(key, cacheSeconds)
+    }
+
+  }
+
+  def getMailNumber(visitorSession: String, mail: String) = {
+    redisClient.get[String](getKeyBySession(visitorSession)).map( x => x.flatMap(y => if(y.split(";").last == mail) y.split(";").headOption else None))
   }
 }
