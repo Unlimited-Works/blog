@@ -52,6 +52,7 @@ object Signin extends Controller {
             if (account.isEmpty || password.isEmpty)
               Future(Ok(compactRender(("result" -> 400) ~ ("msg" -> "账号和密码不能为空"))))
             else {
+              //TODO login with specify field 要求明确的指出是哪个字段
               val rst = LoginModule.verifyAndGetId(account, password)
               rst.flatMap { x =>
                 println(s"AccountVerifyResult - $x")
