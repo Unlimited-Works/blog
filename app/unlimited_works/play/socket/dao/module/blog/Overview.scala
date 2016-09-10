@@ -25,7 +25,7 @@ object Overview {
     val lst = scala.collection.mutable.ListBuffer[OverviewRsp]()
     observable.subscribe(
       s => {
-        playLogger.log("overview Rsp ready - " + lst.mkString("\n"))
+//        playLogger.log("overview Rsp ready - " + lst.mkString("\n"))
         lst.synchronized(lst.+=(s))
       },
       e => p.tryFailure(e),

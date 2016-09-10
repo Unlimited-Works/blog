@@ -25,7 +25,7 @@ object DaoCommunicate {
 
   //todo support reconnect with some complex machines(a litter complex)
   private def reconnect = {
-    playLogger.logLevel = 10
+    playLogger.logLevel = 0
     playLogger.log(s"Instance a DaoCommunicate")
     val client =  new ClientEntrance("127.0.0.1", 10010)
     val connectFuture = client.connect
@@ -37,5 +37,5 @@ object DaoCommunicate {
     reconnect
   }
 
-  playLogger.logAim++=List("get protocol", "taskId-onNext", "proto-json", "task-json")
+//  playLogger.logAim++=List("get protocol", "taskId-onNext", "proto-json", "task-json")
 }

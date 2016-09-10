@@ -15,12 +15,10 @@ import net.liftweb.json.JsonDSL._
 
 import scala.concurrent.Future
 
-
 /**
   * signin page
   */
 object Signin extends Controller {
-
   /**
     * enter signin page
     *

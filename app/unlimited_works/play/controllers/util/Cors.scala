@@ -14,16 +14,11 @@ case class WithCors[A](action: Action[A]) extends Action[A] with Results {
   def apply(request: Request[A]): Future[Result] = {
     implicit val executionContext: ExecutionContext = play.api.libs.concurrent.Execution.defaultContext
     request.headers.get(ORIGIN).flatMap{ origin =>
-      println("entered -- ")
       Config.Cors.find(origin).map { origVal =>
         if (request.method == "OPTIONS") {
           // preflight
-          println("verified -- ")
-
           val corsAction = Action.async(action.parser) {
             request =>
-              println("ok -- ")
-
               Future.successful(Ok("").withHeaders(
                 ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
                 ACCESS_CONTROL_ALLOW_METHODS -> (List("GET", "POST") + "OPTIONS").mkString(", "),
@@ -34,8 +29,6 @@ case class WithCors[A](action: Action[A]) extends Action[A] with Results {
           corsAction(request)
         } else {
           action(request).map { res =>
-            println("ok too -- ")
-
             res.withHeaders(
               ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
               ACCESS_CONTROL_ALLOW_CREDENTIALS -> "true")
