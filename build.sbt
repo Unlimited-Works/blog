@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "com.googlecode.xmemcached" % "xmemcached" % "2.0.1",
 //  "net.debasishg" %% "redisclient" % "3.1",
   "com.scalachan" %% "rxsocket" % "0.9.7",
-  "com.livestream" %% "scredis" % "2.0.6"
+  "com.livestream" %% "scredis" % "2.0.8"
 
 )
 
