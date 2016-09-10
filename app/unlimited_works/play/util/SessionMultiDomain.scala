@@ -8,8 +8,9 @@ import scredis._
 import scala.concurrent.{ExecutionContext, Future}
 
 object RedisService {
-  val client = Redis()
+  val client = Redis(host = "127.0.0.1", port = 7777)
 }
+
 /**
   * should be save a specify place,such as a memcache server
   */
